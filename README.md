@@ -17,3 +17,6 @@ git merge developCero
 
 # 6. Publicar en GitHub
 git push origin main
+
+clave de accesos 
+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---
