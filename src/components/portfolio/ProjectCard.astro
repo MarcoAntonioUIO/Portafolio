@@ -1,0 +1,58 @@
+---
+import type { Project } from "@types/project";
+
+interface Props {
+  project: Project;
+  index?: number;
+}
+
+const { project, index = 0 } = Astro.props;
+---
+<article
+  class="project-card"
+  data-project-card
+  data-category={project.category}
+  data-sector={project.sector}
+>
+  <a class="project-image-link" href={`/proyectos/${project.slug}/`} aria-label={`Ver caso de estudio: ${project.title}`}>
+    <div class="project-image" style={`--project-accent: ${project.accent}`}>
+      <img
+        src={project.image}
+        alt={project.imageAlt}
+        loading={index < 2 ? "eager" : "lazy"}
+        decoding="async"
+        width="1400"
+        height="1000"
+      />
+      <span class="image-index">{String(index + 1).padStart(2, "0")}</span>
+      <span class="image-arrow" aria-hidden="true">↗</span>
+    </div>
+  </a>
+  <div class="project-info">
+    <div>
+      <p class="project-meta">{project.category} <span aria-hidden="true">·</span> {project.year}</p>
+      <h3><a href={`/proyectos/${project.slug}/`}>{project.title}</a></h3>
+      <p class="project-summary">{project.summary}</p>
+    </div>
+    <span class="project-sector">{project.sector}</span>
+  </div>
+</article>
+<style>
+  .project-card { min-width: 0; }
+  .project-image-link { display: block; text-decoration: none; }
+  .project-image { position: relative; overflow: hidden; aspect-ratio: 1.25; border-radius: var(--radius-card); background: var(--project-accent, #e8e8df); }
+  .project-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .55s cubic-bezier(.2,.7,.2,1); }
+  .project-image-link:hover img { transform: scale(1.045); }
+  .image-index, .image-arrow { position: absolute; display: grid; place-items: center; background: rgb(255 255 255 / 88%); backdrop-filter: blur(8px); }
+  .image-index { top: 1rem; left: 1rem; min-width: 38px; height: 30px; border-radius: 999px; font-family: var(--font-mono); font-size: .7rem; }
+  .image-arrow { right: 1rem; bottom: 1rem; width: 44px; height: 44px; border-radius: 50%; font-size: 1.3rem; transition: background .2s ease, transform .2s ease; }
+  .project-image-link:hover .image-arrow { transform: rotate(45deg); background: var(--color-accent); }
+  .project-info { display: flex; align-items: start; justify-content: space-between; gap: 1rem; padding-top: 1rem; }
+  .project-meta { margin: 0 0 .35rem; color: var(--color-muted); font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; }
+  h3 { margin: 0; font-size: clamp(1.3rem, 2.4vw, 1.75rem); line-height: 1.2; letter-spacing: -.05em; }
+  h3 a { text-decoration: none; }
+  h3 a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .project-summary { max-width: 440px; margin: .55rem 0 0; color: var(--color-muted); font-size: .88rem; }
+  .project-sector { flex-shrink: 0; padding: .35rem .6rem; border: 1px solid var(--color-line); border-radius: 999px; color: var(--color-muted); font-size: .68rem; }
+  @media (max-width: 520px) { .project-info { flex-direction: column; } }
+</style>

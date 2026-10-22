@@ -1,0 +1,63 @@
+---
+import { projectCategories, projectSectors } from "@data/projects";
+---
+<div class="filters" aria-label="Filtros de proyectos">
+  <div class="filter-group">
+    <label for="category-filter">Tipo de proyecto</label>
+    <select id="category-filter" name="category">
+      {projectCategories.map((category) => <option value={category}>{category}</option>)}
+    </select>
+  </div>
+  <div class="filter-group">
+    <label for="sector-filter">Sector</label>
+    <select id="sector-filter" name="sector">
+      {projectSectors.map((sector) => <option value={sector}>{sector}</option>)}
+    </select>
+  </div>
+  <button class="reset-button" type="button" id="reset-filters">Limpiar filtros <span aria-hidden="true">↺</span></button>
+  <p id="filter-status" class="filter-status" aria-live="polite">Mostrando todos los proyectos.</p>
+</div>
+<script>
+  const categoryFilter = document.querySelector<HTMLSelectElement>("#category-filter");
+  const sectorFilter = document.querySelector<HTMLSelectElement>("#sector-filter");
+  const resetButton = document.querySelector<HTMLButtonElement>("#reset-filters");
+  const status = document.querySelector<HTMLElement>("#filter-status");
+  const cards = Array.from(document.querySelectorAll<HTMLElement>("#project-grid [data-project-card]"));
+
+  function applyFilters(): void {
+    const category = categoryFilter?.value ?? "Todos";
+    const sector = sectorFilter?.value ?? "Todos los sectores";
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+      const matchesCategory = category === "Todos" || card.dataset.category === category;
+      const matchesSector = sector === "Todos los sectores" || card.dataset.sector === sector;
+      const isVisible = matchesCategory && matchesSector;
+      card.hidden = !isVisible;
+      if (isVisible) visibleCount += 1;
+    });
+
+    if (status) {
+      status.textContent = `Se ${visibleCount === 1 ? "muestra" : "muestran"} ${visibleCount} ${visibleCount === 1 ? "proyecto" : "proyectos"}.`;
+    }
+  }
+
+  categoryFilter?.addEventListener("change", applyFilters);
+  sectorFilter?.addEventListener("change", applyFilters);
+  resetButton?.addEventListener("click", () => {
+    if (categoryFilter) categoryFilter.value = "Todos";
+    if (sectorFilter) sectorFilter.value = "Todos los sectores";
+    applyFilters();
+  });
+</script>
+<style>
+  .filters { display: flex; align-items: end; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; padding: 1rem; border: 1px solid var(--color-line); border-radius: 16px; background: rgb(255 255 255 / 60%); }
+  .filter-group { display: grid; gap: .35rem; min-width: 180px; }
+  label { color: var(--color-muted); font-size: .72rem; font-weight: 700; }
+  select { min-height: 42px; padding: .55rem 2.2rem .55rem .75rem; border: 1px solid var(--color-line); border-radius: 9px; background: white; color: var(--color-ink); }
+  .reset-button { min-height: 42px; padding: .5rem .8rem; border: 0; background: transparent; color: var(--color-muted); cursor: pointer; font-size: .8rem; font-weight: 700; }
+  .reset-button:hover { color: var(--color-ink); }
+  .filter-status { flex-basis: 100%; margin: 0; color: var(--color-muted); font-size: .75rem; }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) { .filters { align-items: stretch; } .filter-group { flex: 1 1 100%; } select { width: 100%; } .reset-button { align-self: start; } }
+</style>

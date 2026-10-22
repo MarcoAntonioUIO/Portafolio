@@ -1,0 +1,115 @@
+---
+import MainLayout from "@layouts/MainLayout.astro";
+import { projects } from "@data/projects";
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const relatedProjects = projects.filter((item) => item.slug !== project.slug).slice(0, 2);
+---
+<MainLayout
+  title={`${project.title} — Caso de estudio | Marco Gómez`}
+  description={project.summary}
+  image={project.image}
+>
+  <article class="case-study">
+    <header class="case-hero container">
+      <a class="back-link" href="/#proyectos">← Volver a proyectos</a>
+      <p class="eyebrow">{project.category} · {project.year}</p>
+      <h1>{project.title}<span>.</span></h1>
+      <p class="case-summary">{project.summary}</p>
+      <div class="case-meta">
+        <div><span>Cliente</span><strong>{project.client}</strong></div>
+        <div><span>Sector</span><strong>{project.sector}</strong></div>
+        <div><span>Mi rol</span><strong>{project.role.join(" · ")}</strong></div>
+      </div>
+    </header>
+
+    <div class="case-image container">
+      <img src={project.image} alt={project.imageAlt} width="1400" height="1000" fetchpriority="high" />
+    </div>
+
+    <section class="case-content container" aria-label="Detalles del proyecto">
+      <div class="case-sidebar">
+        <span class="eyebrow">El proceso</span>
+        <p>De la necesidad a una solución clara.</p>
+      </div>
+      <div class="case-body">
+        <section>
+          <span class="step-label">01 / El reto</span>
+          <h2>Entender antes de construir.</h2>
+          <p>{project.challenge}</p>
+        </section>
+        <section>
+          <span class="step-label">02 / La solución</span>
+          <h2>Una respuesta pensada para crecer.</h2>
+          <p>{project.solution}</p>
+        </section>
+        <section>
+          <span class="step-label">03 / El resultado</span>
+          <h2>Una base útil y mantenible.</h2>
+          <p>{project.outcome}</p>
+        </section>
+        <section>
+          <span class="step-label">Herramientas</span>
+          <div class="stack-list">{project.stack.map((technology) => <span>{technology}</span>)}</div>
+        </section>
+        {project.liveUrl && <a class="button" href={project.liveUrl} target="_blank" rel="noreferrer">Visitar proyecto <span aria-hidden="true">↗</span></a>}
+        {project.repoUrl && <a class="button button--light repo-link" href={project.repoUrl} target="_blank" rel="noreferrer">Ver repositorio <span aria-hidden="true">↗</span></a>}
+      </div>
+    </section>
+
+    <section class="related section">
+      <div class="container">
+        <div class="section-heading">
+          <div><span class="eyebrow">Seguir explorando</span><h2>Otros proyectos.</h2></div>
+          <a class="text-link" href="/#proyectos">Ver todo el portafolio ↗</a>
+        </div>
+        <div class="related-grid">
+          {relatedProjects.map((item, index) => (
+            <a class="related-card" href={`/proyectos/${item.slug}/`}>
+              <img src={item.image} alt="" loading="lazy" width="700" height="500" />
+              <span>{item.category} · {item.year}</span>
+              <strong>{item.title} <span aria-hidden="true">↗</span></strong>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </article>
+</MainLayout>
+<style>
+  .case-hero { padding-top: clamp(3rem, 8vw, 7rem); padding-bottom: 3rem; }
+  .back-link { display: inline-block; margin-bottom: 3.5rem; color: var(--color-muted); font-size: .82rem; text-decoration: none; }
+  .back-link:hover { color: var(--color-ink); text-decoration: underline; }
+  .case-hero h1 { margin: .7rem 0; font-size: clamp(4rem, 12vw, 10rem); line-height: .9; letter-spacing: -.09em; }
+  .case-hero h1 span { color: #879b36; }
+  .case-summary { max-width: 700px; color: var(--color-muted); font-size: clamp(1.1rem, 2vw, 1.5rem); }
+  .case-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--color-line); }
+  .case-meta div { display: grid; align-content: start; gap: .45rem; }
+  .case-meta span, .step-label { color: var(--color-muted); font-family: var(--font-mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
+  .case-meta strong { font-size: .9rem; }
+  .case-image { overflow: hidden; border-radius: 22px; background: #e8e8df; }
+  .case-image img { width: 100%; max-height: 700px; aspect-ratio: 1.6; object-fit: cover; }
+  .case-content { display: grid; grid-template-columns: .6fr 1fr; gap: 5rem; padding-block: clamp(4rem, 9vw, 8rem); }
+  .case-sidebar { align-self: start; position: sticky; top: 120px; }
+  .case-sidebar p { max-width: 250px; font-size: 1.5rem; font-weight: 700; line-height: 1.2; letter-spacing: -.04em; }
+  .case-body section { margin-bottom: 3rem; }
+  .case-body h2 { margin: .65rem 0; font-size: clamp(1.8rem, 3vw, 2.8rem); line-height: 1.1; letter-spacing: -.06em; }
+  .case-body p { color: var(--color-muted); }
+  .stack-list { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1rem; }
+  .stack-list span { padding: .55rem .8rem; border: 1px solid var(--color-line); border-radius: 999px; font-size: .8rem; }
+  .repo-link { margin-left: .5rem; }
+  .related { background: #efefe8; }
+  .related-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+  .related-card { display: grid; gap: .6rem; text-decoration: none; }
+  .related-card img { width: 100%; aspect-ratio: 1.6; object-fit: cover; border-radius: 16px; }
+  .related-card > span { margin-top: .4rem; color: var(--color-muted); font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase; }
+  .related-card strong { display: flex; justify-content: space-between; font-size: 1.4rem; }
+  @media (max-width: 700px) { .case-meta { grid-template-columns: 1fr; gap: 1rem; } .case-content { grid-template-columns: 1fr; gap: 1rem; } .case-sidebar { position: static; } .related-grid { grid-template-columns: 1fr; } .repo-link { margin: .75rem 0 0; } }
+</style>
